@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+{% from 'macros.html' import user_card with context %}
+
+{% block title %}Collectors{% endblock title %}
+
+{% block content %}
+    <div class="page-header">
+        <div class="row">
+            <div class="col-md-12">
+                <a class="btn btn-default btn-sm" href="{{ url_for("main.show_photo", photo_id=photo.id) }}">
+                    <span class="oi oi-arrow-left"></span>Return
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h3>{{ photo.collects|length }} Collectors</h3>
+            {% for collect in collectors %}
+                {{ user_card(user=collect.user) }}
+            {% endfor %}
+        </div>
+    </div>
+    {% if collectors %}
+        <div class="page-footer">
+            {{ render_pagination(pagination, align="center") }}
+        </div>
+    {% endif %}
+{% endblock content %}

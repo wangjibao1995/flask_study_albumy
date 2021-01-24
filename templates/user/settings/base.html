@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/form.html' import render_form %}
+{% from 'bootstrap/nav.html' import render_nav_item %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>Settings</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="nav nav-pills flex-column" role="tablist" aria-orientation="vertical">
+                {{ render_nav_item(endpoint="user.edit_profile", text="Edit Profile") }}
+                {{ render_nav_item(endpoint="user.change_avatar", text="Change Avatar") }}
+                {{ render_nav_item(endpoint="user.change_password", text="Change Password") }}
+                {{ render_nav_item(endpoint="user.change_email_request", text="Change Email") }}
+                {{ render_nav_item(endpoint="user.notification_setting", text="Notification") }}
+                {{ render_nav_item(endpoint="user.privacy_setting", text="Privacy") }}
+                {{ render_nav_item(endpoint="user.delete_account", text="Delete Account") }}
+            </div>
+        </div>
+        <div class="col-md-9">
+            {% block setting_content %}{% endblock setting_content %}
+        </div>
+    </div>
+{% endblock content %}

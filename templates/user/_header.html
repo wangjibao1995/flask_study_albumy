@@ -1,0 +1,76 @@
+{% from 'bootstrap/nav.html' import render_nav_item %}
+{% from 'macros.html' import follow_area with context %}
+
+<div class="row">
+    <div class="col-md-3">
+        <img class="img-fluid rounded avatar-l" src="{{ url_for("main.get_avatar", filename=user.avatar_l) }}">
+    </div>
+    <div class="col-md-9">
+        <h1>{{ user.name }}
+            <small class="text-muted">{{ user.username }}</small>
+        </h1>
+        {% if user.bio %}
+            <p>{{ user.bio }}</p>
+        {% endif %}
+        <p>
+            {% if user.website %}
+                <span class="oi oi-link-intact"></span>
+                <a href="{{ user.website }}" target="_blank">{{ user.website|truncate(30) }}</a>
+            {% endif %}
+            {% if user.location %}
+                <span class="oi oi-map-marker"></span>
+                <a href="https://google.com/maps?q={{ user.location }}" target="_blank">{{ user.location|truncate(20) }}</a>
+            {% endif %}
+            <span class="oi oi-calendar"></span>
+            Joined {{ moment(user.member_since).format("LL") }}
+        </p>
+        <div>  <!-- 显示用户主页头部的最下面一栏，状态 -->
+            {% if current_user != user %}
+                {% if current_user.can("MODERATE") %}
+                    {% if user.locked %}
+                        <form class="inline" action="{{ url_for("admin.unlock_user", user_id=user.id) }}" method="post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="submit" class="btn btn-secondary btn-sm" value="Unlock">
+                        </form>
+                    {% else %}
+                        <form class="inline" action="{{ url_for("admin.lock_user", user_id=user.id) }}" method="post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="submit" class="btn btn-warning btn-sm" value="Lock">
+                        </form>
+                    {% endif %}
+                    {% if user.active %}
+                        <form class="inline" action="{{ url_for("admin.block_user", user_id=user.id) }}" method="post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="submit" class="btn btn-warning btn-sm" value="Block">
+                        </form>
+                    {% else %}
+                        <form class="inline" action="{{ url_for("admin.unblock_user", user_id=user.id) }}" method="post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="submit" class="btn btn-secondary btn-sm" value="Unblock">
+                        </form>
+                    {% endif %}
+                    <a class="btn btn-light btn-sm" href="mailto:{{ user.email }}">Email</a>
+                {% endif %}
+                {% if current_user.is_admin %}
+                    <a class="btn btn-warning btn-sm" href="{{ url_for("admin.edit_profile_admin", user_id=user.id) }}">Edit profile</a>
+                {% endif %}
+            {% endif %}
+            <div class="float-right">
+                {{ follow_area(user) }}
+                {% if current_user.is_authenticated and user == current_user %}
+                    <a class="btn btn-outline-primary btn-sm" href="{{ url_for("user.edit_profile") }}">Edit profile</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="user-nav">
+    <ul class="nav nav-tabs">
+        {# render_nav_item 的详细解释，https://bootstrap-flask.readthedocs.io/en/latest/macros.html #}
+        <!-- 用端点值来判断当前 nav 是否处于激活状态 -->
+        {{ render_nav_item(endpoint="user.index", text="Photo", badge=user.photos|length, username=user.username) }}
+        {{ render_nav_item(endpoint="user.show_collections", text="Collections", badge=user.collects|length, username=user.username) }}
+        {{ render_nav_item(endpoint="user.show_following", text="followings", badge=user.followings.count() - 1, username=user.username) }}
+        {{ render_nav_item(endpoint="user.show_followers", text="followers", badge=user.followers.count() - 1, username=user.username) }}
+    </ul>
+</div>
